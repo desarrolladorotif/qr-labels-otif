@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etiqueta QR - OTIF Logística</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #f1c40f, #2ecc71, #3498db, #9b59b6);
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            opacity: 0.95;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .info-item {
+            background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 6px solid #3498db;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .info-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        
+        .info-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border-left-color: #e74c3c;
+        }
+        
+        .info-item:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .info-label {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .info-value {
+            font-size: 22px;
+            color: #2c3e50;
+            word-break: break-word;
+            font-weight: 600;
+            line-height: 1.4;
+            min-height: 30px;
+        }
+        
+        .timestamp {
+            text-align: center;
+            margin-top: 40px;
+            padding: 25px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 12px;
+            color: #1565c0;
+            font-size: 16px;
+            font-weight: 600;
+            border: 2px solid #90caf9;
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        
+        .error, .loading {
+            text-align: center;
+            padding: 60px 40px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .error {
+            color: #e74c3c;
+        }
+        
+        .loading {
+            color: #7f8c8d;
+        }
+        
+        .error h2, .loading h2 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 300;
+        }
+        
+        .error p, .loading p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.2s linear infinite;
+            margin: 0 auto 30px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #6c757d;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .debug-info h4 {
+            margin-bottom: 10px;
+            color: #495057;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 12px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 26px;
+            }
+            
+            .logo {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+            
+            .content {
+                padding: 30px 25px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .info-item {
+                padding: 20px;
+            }
+            
+            .info-value {
+                font-size: 20px;
+            }
+            
+            .timestamp {
+                padding: 20px;
+                font-size: 14px;
+            }
+            
+            .footer {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🏷️</div>
+            <h1>Información de Etiqueta</h1>
+            <p>OTIF - Logística y Distribución</p>
+        </div>
+        
+        <div class="content" id="content">
+            <div class="loading">
+                <div class="spinner"></div>
+                <h2>Cargando información...</h2>
+                <p>Procesando datos de la etiqueta</p>
+                <p>Por favor espera un momento</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>🚀 Sistema de Etiquetas QR | OTIF 2025</strong></p>
+            <p>Tecnología de códigos QR para trazabilidad industrial</p>
+        </div>
+    </div>
+
+    <script>
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                producto: params.get('producto') || '',
+                lote: params.get('lote') || '',
+                plancha: params.get('plancha') || '',
+                alto: params.get('alto') || '',
+                largo: params.get('largo') || '',
+                saldo: params.get('saldo') || '',
+                total: params.get('total') || '',
+                turno: params.get('turno') || '',
+                coordenadas: params.get('coordenadas') || '',
+                operario: params.get('operario') || '',
+                fecha: params.get('fecha') || '',
+                idQr: params.get('idQr') || '', // Nuevo parámetro ID QR
+                idInventario: params.get('idInventario') || '' // Nuevo parámetro ID Inventario
+            };
+        }
+
+        function displayInfo() {
+            const data = getUrlParams();
+            const content = document.getElementById('content');
+            
+            // Debug: mostrar información en consola
+            console.log('🔍 URL actual:', window.location.href);
+            console.log('📋 Parámetros recibidos:', data);
+            
+            // Verificar si hay datos válidos
+            const hasData = Object.values(data).some(value => value.trim() !== '');
+            
+            if (!hasData) {
+                content.innerHTML = `
+                    <div class="error">
+                        <h2>❌ Sin Datos de Etiqueta</h2>
+                        <p>No se encontraron parámetros válidos en la URL</p>
+                        <p>Verifica que el código QR haya sido generado correctamente</p>
+                        <p>La URL debe contener parámetros como: ?producto=...&lote=...</p>
+                        
+                        <div class="debug-info">
+                            <h4>🔧 Información de Debug:</h4>
+                            <p><strong>URL completa:</strong><br>${window.location.href}</p>
+                            <p><strong>Parámetros encontrados:</strong><br>${JSON.stringify(data, null, 2)}</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Generar HTML con los datos disponibles
+            let infoHtml = '';
+            
+            if (data.producto) {
+                infoHtml += `
+                    <div class="info-item">
+                        <div class="info-label">📦 Producto</div>
+                        <div class="info-value">${data.producto}</div>
+                    </div>
+                `;
+            }
+            
+            if (data.lote) {
+                infoHtml += `
+                    <div class="info-item">
+                        <div class="info-label">🏷️ Lote</div>
+                        <div class="info-value">${data.lote}</div>
+                    </div>
+                `;
+            }
+            
+            if (data.plancha) {
+                infoHtml += `
+                    <div class="info-item">
+                        <div class="info-label">📋 Plancha</div>
+                        <div class="info-value">${data.plancha}</div>
+                    </div>
+                `;
+            }
+            
+            if (data.alto) {
+                infoHtml += `
+                    <div class="info-item">
+                        <div class="info-label">📏 Alto</div>
+                        <div class="info-value">${data.alto}</div>
+                    </div>
+                `;
+            }
+            
+            if (data.largo) {
+                infoHtml += `
+                    <div class="info-item">
+                        <div class="info-label">📐 Largo</div>
+                        <div class="info-value">${data.largo}</div>
+                    </div>
+                `;
+            }
+            
+            if (data.saldo) {
+                infoHtml += `
+                    <div class="info-item">
+                        <div class="info-label">📊 Saldo</div>
+                        <div class="info-value">${data.saldo}</div>
+                    </div>
+                `;
+            }
+            
+            if (data.total) {
+                infoHtml += `
+                    <div class="info-item">
+                        <div class="info-label">💯 Total</div>
+                        <div class="info-value">${data.total}</div>
+                    </div>
+                `;
+            }
+            
+            if (data.turno) {
+                infoHtml += `
+                    <div class="info-item">
+                        <div class="info-label">🕐 Turno</div>
+                        <div class="info-value">${data.turno}</div>
+                    </div>
+                `;
+            }
+            
+            if (data.operario) {
+                infoHtml += `
+                    <div class="info-item">
+                        <div class="info-label">👤 Operario</div>
+                        <div class="info-value">${data.operario}</div>
+                    </div>
+                `;
+            }
+            
+            if (data.coordenadas) {
+                infoHtml += `
+                    <div class="info-item">
+                        <div class="info-label">📍 Coordenadas</div>
+                        <div class="info-value">${data.coordenadas}</div>
+                    </div>
+                `;
+            }
+            
+            // Mostrar los IDs con diseño destacado
+            if (data.idQr) {
+                infoHtml += `
+                    <div class="info-item" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-left: 4px solid #fff;">
+                        <div class="info-label" style="color: rgba(255, 255, 255, 0.9);">🏷️ ID QR</div>
+                        <div class="info-value" style="color: white; font-size: 24px; font-weight: bold;">${data.idQr}</div>
+                    </div>
+                `;
+            }
+            
+            if (data.idInventario) {
+                infoHtml += `
+                    <div class="info-item" style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; border-left: 4px solid #fff;">
+                        <div class="info-label" style="color: rgba(255, 255, 255, 0.9);">📦 ID Inventario</div>
+                        <div class="info-value" style="color: white; font-size: 20px; font-weight: bold;">${data.idInventario}</div>
+                    </div>
+                `;
+            }
+
+            content.innerHTML = `
+                <div class="info-grid">
+                    ${infoHtml}
+                </div>
+                
+                ${data.fecha ? `
+                    <div class="timestamp">
+                        <p><strong>🕒 Etiqueta generada:</strong> ${data.fecha}</p>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        // Cargar datos cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simular un pequeño delay para el efecto de carga
+            setTimeout(displayInfo, 1200);
+        });
+        
+        // Log para debugging
+        console.log('🏷️ OTIF QR Label System inicializado');
+        console.log('🌐 GitHub Pages URL:', window.location.origin);
+    </script>
+</body>
+</html>
